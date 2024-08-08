@@ -1,5 +1,5 @@
 import { AxiosAdapter } from 'axios';
-import { AnimeParser, ISearch, IAnimeInfo, IAnimeResult, ISource, IAnimeEpisode, IEpisodeServer, Genres, MangaParser, IMangaChapterPage, IMangaInfo, IMangaResult, ProxyConfig, IStaff } from '../../models';
+import { AnimeParser, Genres, IAnimeEpisode, IAnimeInfo, IAnimeResult, IEpisodeServer, IMangaChapterPage, IMangaInfo, IMangaResult, ISearch, ISource, IStaff, MangaParser, ProxyConfig } from '../../models';
 declare class Anilist extends AnimeParser {
     proxyConfig?: ProxyConfig | undefined;
     readonly name = "Anilist";
@@ -186,6 +186,8 @@ declare class Anilist extends AnimeParser {
              */
             fetchChapterPages: (chapterId: string, ...args: any) => Promise<IMangaChapterPage[]>;
             fetchMangaInfo: (id: string, ...args: any) => Promise<IMangaInfo>;
+            fetchTrendingManga: (page?: number, perPage?: number) => Promise<ISearch<IMangaResult>>;
+            fetchPopularManga: (page?: number, perPage?: number) => Promise<ISearch<IMangaResult>>;
         };
     };
     private findMangaSlug;

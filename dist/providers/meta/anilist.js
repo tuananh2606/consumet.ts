@@ -6,15 +6,15 @@ var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importDefault(require("axios"));
 const models_1 = require("../../models");
-const utils_1 = require("../../utils");
 const gogoanime_1 = __importDefault(require("../../providers/anime/gogoanime"));
+const utils_1 = require("../../utils");
+const utils_2 = require("../../utils/utils");
+const _9anime_1 = __importDefault(require("../anime/9anime"));
 const anify_1 = __importDefault(require("../anime/anify"));
+const bilibili_1 = __importDefault(require("../anime/bilibili"));
+const crunchyroll_1 = __importDefault(require("../anime/crunchyroll"));
 const zoro_1 = __importDefault(require("../anime/zoro"));
 const mangasee123_1 = __importDefault(require("../manga/mangasee123"));
-const crunchyroll_1 = __importDefault(require("../anime/crunchyroll"));
-const bilibili_1 = __importDefault(require("../anime/bilibili"));
-const _9anime_1 = __importDefault(require("../anime/9anime"));
-const utils_2 = require("../../utils/utils");
 class Anilist extends models_1.AnimeParser {
     /**
      * This class maps anilist to kitsu with any other anime provider.
@@ -1943,6 +1943,120 @@ Anilist.Manga = class Manga {
             }
             catch (error) {
                 throw Error(error.message);
+            }
+        };
+        this.fetchTrendingManga = async (page = 1, perPage = 10) => {
+            const options = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                },
+                query: (0, utils_1.anilistTrendingQuery)(page, perPage),
+            };
+            try {
+                const { data } = await axios_1.default.post(new _a().anilistGraphqlUrl, options);
+                const res = {
+                    currentPage: data.data.Page.pageInfo.currentPage,
+                    hasNextPage: data.data.Page.pageInfo.hasNextPage,
+                    results: data.data.Page.media.map((item) => {
+                        var _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
+                        return ({
+                            id: item.id.toString(),
+                            malId: item.idMal,
+                            title: {
+                                romaji: item.title.romaji,
+                                english: item.title.english,
+                                native: item.title.native,
+                                userPreferred: item.title.userPreferred,
+                            } || item.title.romaji,
+                            status: item.status == 'RELEASING'
+                                ? models_1.MediaStatus.ONGOING
+                                : item.status == 'FINISHED'
+                                    ? models_1.MediaStatus.COMPLETED
+                                    : item.status == 'NOT_YET_RELEASED'
+                                        ? models_1.MediaStatus.NOT_YET_AIRED
+                                        : item.status == 'CANCELLED'
+                                            ? models_1.MediaStatus.CANCELLED
+                                            : item.status == 'HIATUS'
+                                                ? models_1.MediaStatus.HIATUS
+                                                : models_1.MediaStatus.UNKNOWN,
+                            image: (_e = (_c = (_b = item.coverImage) === null || _b === void 0 ? void 0 : _b.extraLarge) !== null && _c !== void 0 ? _c : (_d = item.coverImage) === null || _d === void 0 ? void 0 : _d.large) !== null && _e !== void 0 ? _e : (_f = item.coverImage) === null || _f === void 0 ? void 0 : _f.medium,
+                            imageHash: (0, utils_2.getHashFromImage)((_k = (_h = (_g = item.coverImage) === null || _g === void 0 ? void 0 : _g.extraLarge) !== null && _h !== void 0 ? _h : (_j = item.coverImage) === null || _j === void 0 ? void 0 : _j.large) !== null && _k !== void 0 ? _k : (_l = item.coverImage) === null || _l === void 0 ? void 0 : _l.medium),
+                            cover: item.bannerImage,
+                            coverHash: (0, utils_2.getHashFromImage)(item.bannerImage),
+                            popularity: item.popularity,
+                            description: item.description,
+                            rating: item.averageScore,
+                            genres: item.genres,
+                            color: (_m = item.coverImage) === null || _m === void 0 ? void 0 : _m.color,
+                            totalChapters: item.chapters,
+                            volumes: item.volumes,
+                            type: item.format,
+                            releaseDate: item.seasonYear,
+                        });
+                    }),
+                };
+                return res;
+            }
+            catch (err) {
+                throw new Error(err.message);
+            }
+        };
+        this.fetchPopularManga = async (page = 1, perPage = 10) => {
+            const options = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                },
+                query: (0, utils_1.anilistPopularQuery)(page, perPage, 'MANGA'),
+            };
+            try {
+                const { data } = await axios_1.default.post(new _a().anilistGraphqlUrl, options);
+                const res = {
+                    currentPage: data.data.Page.pageInfo.currentPage,
+                    hasNextPage: data.data.Page.pageInfo.hasNextPage,
+                    results: data.data.Page.media.map((item) => {
+                        var _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
+                        return ({
+                            id: item.id.toString(),
+                            malId: item.idMal,
+                            title: {
+                                romaji: item.title.romaji,
+                                english: item.title.english,
+                                native: item.title.native,
+                                userPreferred: item.title.userPreferred,
+                            } || item.title.romaji,
+                            status: item.status == 'RELEASING'
+                                ? models_1.MediaStatus.ONGOING
+                                : item.status == 'FINISHED'
+                                    ? models_1.MediaStatus.COMPLETED
+                                    : item.status == 'NOT_YET_RELEASED'
+                                        ? models_1.MediaStatus.NOT_YET_AIRED
+                                        : item.status == 'CANCELLED'
+                                            ? models_1.MediaStatus.CANCELLED
+                                            : item.status == 'HIATUS'
+                                                ? models_1.MediaStatus.HIATUS
+                                                : models_1.MediaStatus.UNKNOWN,
+                            image: (_e = (_c = (_b = item.coverImage) === null || _b === void 0 ? void 0 : _b.extraLarge) !== null && _c !== void 0 ? _c : (_d = item.coverImage) === null || _d === void 0 ? void 0 : _d.large) !== null && _e !== void 0 ? _e : (_f = item.coverImage) === null || _f === void 0 ? void 0 : _f.medium,
+                            imageHash: (0, utils_2.getHashFromImage)((_k = (_h = (_g = item.coverImage) === null || _g === void 0 ? void 0 : _g.extraLarge) !== null && _h !== void 0 ? _h : (_j = item.coverImage) === null || _j === void 0 ? void 0 : _j.large) !== null && _k !== void 0 ? _k : (_l = item.coverImage) === null || _l === void 0 ? void 0 : _l.medium),
+                            cover: item.bannerImage,
+                            coverHash: (0, utils_2.getHashFromImage)(item.bannerImage),
+                            popularity: item.popularity,
+                            description: item.description,
+                            rating: item.averageScore,
+                            genres: item.genres,
+                            color: (_m = item.coverImage) === null || _m === void 0 ? void 0 : _m.color,
+                            totalChapters: item.chapters,
+                            volumes: item.volumes,
+                            type: item.format,
+                            releaseDate: item.seasonYear,
+                        });
+                    }),
+                };
+                return res;
+            }
+            catch (err) {
+                throw new Error(err.message);
             }
         };
         this.provider = provider || new mangasee123_1.default();

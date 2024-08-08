@@ -1951,7 +1951,7 @@ Anilist.Manga = class Manga {
                     'Content-Type': 'application/json',
                     Accept: 'application/json',
                 },
-                query: (0, utils_1.anilistTrendingQuery)(page, perPage),
+                query: (0, utils_1.anilistTrendingQuery)(page, perPage, 'MANGA'),
             };
             try {
                 const { data } = await axios_1.default.post(new _a().anilistGraphqlUrl, options);

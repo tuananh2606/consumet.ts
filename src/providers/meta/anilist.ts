@@ -2315,7 +2315,7 @@ class Anilist extends AnimeParser {
           'Content-Type': 'application/json',
           Accept: 'application/json',
         },
-        query: anilistTrendingQuery(page, perPage),
+        query: anilistTrendingQuery(page, perPage, 'MANGA'),
       };
 
       try {

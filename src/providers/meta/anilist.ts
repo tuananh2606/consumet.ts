@@ -2312,6 +2312,125 @@ class Anilist extends AnimeParser {
         throw Error((error as Error).message);
       }
     };
+    fetchTrendingManga = async (page: number = 1, perPage: number = 10): Promise<ISearch<IAnimeResult>> => {
+      const options = {
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        query: anilistTrendingQuery(page, perPage),
+      };
+  
+      try {
+        const { data } = await axios.post(new Anilist().anilistGraphqlUrl, options);
+  
+        const res: ISearch<IMangaResult> = {
+          currentPage: data.data.Page.pageInfo.currentPage,
+          hasNextPage: data.data.Page.pageInfo.hasNextPage,
+          results: data.data.Page.media.map((item: any): IMangaResult => ({
+            id: item.id.toString(),
+            malId: item.idMal,
+            title:
+              {
+                romaji: item.title.romaji,
+                english: item.title.english,
+                native: item.title.native,
+                userPreferred: item.title.userPreferred,
+              } || item.title.romaji,
+              status:
+              item.status == 'RELEASING'
+                ? MediaStatus.ONGOING
+                : item.status == 'FINISHED'
+                ? MediaStatus.COMPLETED
+                : item.status == 'NOT_YET_RELEASED'
+                ? MediaStatus.NOT_YET_AIRED
+                : item.status == 'CANCELLED'
+                ? MediaStatus.CANCELLED
+                : item.status == 'HIATUS'
+                ? MediaStatus.HIATUS
+                : MediaStatus.UNKNOWN,
+            image: item.coverImage?.extraLarge ?? item.coverImage?.large ?? item.coverImage?.medium,
+            imageHash: getHashFromImage(
+              item.coverImage?.extraLarge ?? item.coverImage?.large ?? item.coverImage?.medium
+            ),
+            cover: item.bannerImage,
+            coverHash: getHashFromImage(item.bannerImage),
+            popularity: item.popularity,
+            description: item.description,
+            rating: item.averageScore,
+            genres: item.genres,
+            color: item.coverImage?.color,
+            totalChapters: item.chapters,
+            volumes: item.volumes,
+            type: item.format,
+            releaseDate: item.seasonYear,
+          })),
+        };
+        return res;
+      } catch (err) {
+        throw new Error((err as Error).message);
+      }
+    };
+    fetchPopularManga = async (page: number = 1, perPage: number = 10): Promise<ISearch<IMangaResult>> => {
+      const options = {
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        query: anilistPopularQuery(page, perPage, 'MANGA'),
+      };
+  
+      try {
+        const { data } = await axios.post(new Anilist().anilistGraphqlUrl, options);
+  
+        const res: ISearch<IMangaResult> = {
+          currentPage: data.data.Page.pageInfo.currentPage,
+          hasNextPage: data.data.Page.pageInfo.hasNextPage,
+          results: data.data.Page.media.map((item: any): IMangaResult => ({
+            id: item.id.toString(),
+            malId: item.idMal,
+            title:
+              {
+                romaji: item.title.romaji,
+                english: item.title.english,
+                native: item.title.native,
+                userPreferred: item.title.userPreferred,
+              } || item.title.romaji,
+              status:
+              item.status == 'RELEASING'
+                ? MediaStatus.ONGOING
+                : item.status == 'FINISHED'
+                ? MediaStatus.COMPLETED
+                : item.status == 'NOT_YET_RELEASED'
+                ? MediaStatus.NOT_YET_AIRED
+                : item.status == 'CANCELLED'
+                ? MediaStatus.CANCELLED
+                : item.status == 'HIATUS'
+                ? MediaStatus.HIATUS
+                : MediaStatus.UNKNOWN,
+            image: item.coverImage?.extraLarge ?? item.coverImage?.large ?? item.coverImage?.medium,
+            imageHash: getHashFromImage(
+              item.coverImage?.extraLarge ?? item.coverImage?.large ?? item.coverImage?.medium
+            ),
+            cover: item.bannerImage,
+            coverHash: getHashFromImage(item.bannerImage),
+            popularity: item.popularity,
+            description: item.description,
+            rating: item.averageScore,
+            genres: item.genres,
+            color: item.coverImage?.color,
+            totalChapters: item.chapters,
+            volumes: item.volumes,
+            type: item.format,
+            releaseDate: item.seasonYear,
+          })),
+        };
+        return res;
+      } catch (err) {
+        throw new Error((err as Error).message);
+      }
+    };
+    
   };
 
   private findMangaSlug = async (
